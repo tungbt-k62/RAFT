@@ -23,7 +23,7 @@ def load_image(imfile):
     return img[None].to(DEVICE)
 
 
-def viz(img, flo):
+def viz(img, flo, filename):
     img = img[0].permute(1,2,0).cpu().numpy()
     flo = flo[0].permute(1,2,0).cpu().numpy()
     
@@ -34,9 +34,9 @@ def viz(img, flo):
     # import matplotlib.pyplot as plt
     # plt.imshow(img_flo / 255.0)
     # plt.show()
-
-    cv2.imshow('image', img_flo[:, :, [2,1,0]]/255.0)
-    cv2.waitKey()
+    cv2.imwrite("/content/flow_1/{}".format(filename), flo)
+    # cv2.imshow('image', img_flo[:, :, [2,1,0]]/255.0)
+    # cv2.waitKey()
 
 
 def demo(args):
@@ -48,22 +48,26 @@ def demo(args):
     model.eval()
 
     with torch.no_grad():
-        images = glob.glob(os.path.join(args.path, '*.png')) + \
-                 glob.glob(os.path.join(args.path, '*.jpg'))
-        
-        images = sorted(images)
+        f_path = args.txt_path
+        f = open(f_path, "r")
+        images = f.read().splitlines()
+        f.close()
+        # images = sorted(images)
         for id, imfile1 in enumerate(images):
             if id < 8:
                 continue
+            filename = imfile1.split(" ")[0]
+            imfile1 = "frames1/" + imfile1.split(" ")[0]
             imfile2 = images[id-8]
+            imfile2 = "frames1/" + imfile2.split(" ")[0]
+            print(imfile2, imfile1, filename)
             image1 = load_image(imfile1)
             image2 = load_image(imfile2)
-
+            print(image1.shape)
             padder = InputPadder(image1.shape)
             image1, image2 = padder.pad(image1, image2)
-
             flow_low, flow_up = model(image2, image1, iters=20, test_mode=True)
-            viz(image2, flow_up)
+            viz(image1, flow_up, filename)
 
 
 if __name__ == '__main__':
@@ -73,6 +77,7 @@ if __name__ == '__main__':
     parser.add_argument('--small', action='store_true', help='use small model')
     parser.add_argument('--mixed_precision', action='store_true', help='use mixed precision')
     parser.add_argument('--alternate_corr', action='store_true', help='use efficent correlation implementation')
+    parser.add_argument('--txt_path', help='txt to path img')
     args = parser.parse_args()
 
     demo(args)
