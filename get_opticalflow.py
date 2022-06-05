@@ -54,7 +54,7 @@ def demo(args):
         f.close()
         # images = sorted(images)
         for id, item in enumerate(images):
-#             if id < 8:
+#             if id < 4:
 #                 continue
             path, speed, video_id, frame_id = item.split(" ")
             imfile1 = "/content/data1_6/Untitled{}_frame_{}.jpg".format(video_id, frame_id)
