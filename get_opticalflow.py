@@ -34,7 +34,7 @@ def viz(img, flo, filename):
     # import matplotlib.pyplot as plt
     # plt.imshow(img_flo / 255.0)
     # plt.show()
-    cv2.imwrite("/content/flow224_5/{}".format(filename), flo)
+    cv2.imwrite("/content/flow224_5/Untitled{}_frame_{}.jpg".format(video_id, frame_id), flo)
     # cv2.imshow('image', img_flo[:, :, [2,1,0]]/255.0)
     # cv2.waitKey()
 
@@ -53,21 +53,19 @@ def demo(args):
         images = f.read().splitlines()
         f.close()
         # images = sorted(images)
-        for id, imfile1 in enumerate(images):
-            if id < 8:
-                continue
-            filename = imfile1.split(" ")[0]
-            imfile1 = "/content/data1_6/" + imfile1.split(" ")[0]
-            imfile2 = images[id-8]
-            imfile2 = "/content/data1_6/" + imfile2.split(" ")[0]
-            print(imfile2, imfile1, filename)
+        for id, item in enumerate(images):
+#             if id < 8:
+#                 continue
+            path, speed, video_id, frame_id = item.split(" ")
+            imfile1 = "/content/data1_6/Untitled{}_frame_{}.jpg".format(video_id, frame_id)
+            imfile2 = "/content/data1_6/Untitled{}_frame_{}.jpg".format(video_id, frame_id-4)
+            print(imfile2, imfile1)
             image1 = load_image(imfile1)
             image2 = load_image(imfile2)
-            print(image1.shape)
             padder = InputPadder(image1.shape)
             image1, image2 = padder.pad(image1, image2)
             flow_low, flow_up = model(image2, image1, iters=20, test_mode=True)
-            viz(image1, flow_up, filename)
+            viz(image1, flow_up, video_id, frame_id)
 
 
 if __name__ == '__main__':
