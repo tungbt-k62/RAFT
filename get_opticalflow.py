@@ -23,7 +23,7 @@ def load_image(imfile):
     return img[None].to(DEVICE)
 
 
-def viz(img, flo, filename):
+def viz(img, flo, video_id, frame_id):
     img = img[0].permute(1,2,0).cpu().numpy()
     flo = flo[0].permute(1,2,0).cpu().numpy()
     
@@ -34,7 +34,7 @@ def viz(img, flo, filename):
     # import matplotlib.pyplot as plt
     # plt.imshow(img_flo / 255.0)
     # plt.show()
-    cv2.imwrite("/content/flow224_5/Untitled{}_frame_{}.jpg".format(video_id, frame_id), flo)
+    cv2.imwrite("/content/flow_{}/Untitled{}_frame_{}.jpg".format(video_id, video_id, frame_id), flo)
     # cv2.imshow('image', img_flo[:, :, [2,1,0]]/255.0)
     # cv2.waitKey()
 
@@ -57,8 +57,10 @@ def demo(args):
 #             if id < 4:
 #                 continue
             path, speed, video_id, frame_id = item.split(" ")
-            imfile1 = "/content/data1_6/Untitled{}_frame_{}.jpg".format(video_id, frame_id)
-            imfile2 = "/content/data1_6/Untitled{}_frame_{}.jpg".format(video_id, frame_id-4)
+            if int(frame_id)<4:
+                continue
+            imfile1 = "/content/frames{}/Untitled{}_frame_{}.jpg".format(video_id, video_id, frame_id)
+            imfile2 = "/content/frames{}/Untitled{}_frame_{}.jpg".format(video_id, video_id, int(frame_id)-4)
             print(imfile2, imfile1)
             image1 = load_image(imfile1)
             image2 = load_image(imfile2)
